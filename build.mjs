@@ -1,0 +1,10 @@
+import { build } from "esbuild";
+import fs from "fs";
+const r = await build({ entryPoints: ["src/app.js"], bundle: true, minify: true, format: "iife", write: false, target: "safari15" });
+const js = r.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");
+const icon = "data:image/png;base64," + fs.readFileSync("src/icon.png").toString("base64");
+let html = fs.readFileSync("src/template.html", "utf8").replaceAll("__ICON__", icon);
+html = html.replace("__APP__", () => js);
+fs.mkdirSync("dist", { recursive: true });
+fs.writeFileSync("dist/index.html", html);
+console.log("dist/index.html", (html.length / 1024).toFixed(0), "KB");
